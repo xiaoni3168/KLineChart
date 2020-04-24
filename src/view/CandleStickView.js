@@ -75,7 +75,7 @@ export default class CandleStickView extends TechnicalIndicatorView {
         if (timeLine.gradientFill.display) {
           let gradient = this._ctx.createLinearGradient(0, 0, 0, this._height + timeLine.gradientFill.offsetTop)
           gradient.addColorStop(0, timeLine.gradientFill.topColor)
-          gradient.addColorStop(0, timeLine.gradientFill.bottomColor)
+          gradient.addColorStop(1, timeLine.gradientFill.bottomColor)
           this._ctx.fillStyle = gradient
         } else {
           this._ctx.fillStyle = timeLine.areaFillColor

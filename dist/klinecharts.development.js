@@ -5752,7 +5752,7 @@ var CandleStickView = /*#__PURE__*/function (_TechnicalIndicatorVi) {
             var gradient = _this._ctx.createLinearGradient(0, 0, 0, _this._height + timeLine.gradientFill.offsetTop);
 
             gradient.addColorStop(0, timeLine.gradientFill.topColor);
-            gradient.addColorStop(0, timeLine.gradientFill.bottomColor);
+            gradient.addColorStop(1, timeLine.gradientFill.bottomColor);
             _this._ctx.fillStyle = gradient;
           } else {
             _this._ctx.fillStyle = timeLine.areaFillColor;
