@@ -515,7 +515,13 @@ var defaultRealTime = {
   timeLine: {
     color: '#1e88e5',
     size: 1,
-    areaFillColor: 'rgba(30, 136, 229, 0.08)'
+    areaFillColor: 'rgba(30, 136, 229, 0.08)',
+    gradientFill: {
+      display: false,
+      topColor: '#000000',
+      bottomColor: '#ffffff',
+      offsetTop: 0
+    }
   },
 
   /**
@@ -5742,7 +5748,15 @@ var CandleStickView = /*#__PURE__*/function (_TechnicalIndicatorVi) {
 
         if (timeLineAreaPoints.length > 0) {
           // 绘制分时线填充区域
-          _this._ctx.fillStyle = timeLine.areaFillColor;
+          if (timeLine.gradientFill.display) {
+            var gradient = _this._ctx.createLinearGradient(0, 0, 0, _this._height + timeLine.gradient.offsetTop);
+
+            gradient.addColorStop(0, timeLine.gradient.topColor);
+            gradient.addColorStop(0, timeLine.gradient.bottomColor);
+            _this._ctx.fillStyle = gradient;
+          } else {
+            _this._ctx.fillStyle = timeLine.areaFillColor;
+          }
 
           _this._ctx.beginPath();
 

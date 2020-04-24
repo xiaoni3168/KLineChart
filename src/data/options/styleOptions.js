@@ -168,7 +168,13 @@ const defaultRealTime = {
   timeLine: {
     color: '#1e88e5',
     size: 1,
-    areaFillColor: 'rgba(30, 136, 229, 0.08)'
+    areaFillColor: 'rgba(30, 136, 229, 0.08)',
+    gradientFill: {
+      display: false,
+      topColor: '#000000',
+      bottomColor: '#ffffff',
+      offsetTop: 0
+    }
   },
   /**
    * 均线
