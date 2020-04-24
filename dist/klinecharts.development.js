@@ -5749,10 +5749,10 @@ var CandleStickView = /*#__PURE__*/function (_TechnicalIndicatorVi) {
         if (timeLineAreaPoints.length > 0) {
           // 绘制分时线填充区域
           if (timeLine.gradientFill.display) {
-            var gradient = _this._ctx.createLinearGradient(0, 0, 0, _this._height + timeLine.gradient.offsetTop);
+            var gradient = _this._ctx.createLinearGradient(0, 0, 0, _this._height + timeLine.gradientFill.offsetTop);
 
-            gradient.addColorStop(0, timeLine.gradient.topColor);
-            gradient.addColorStop(0, timeLine.gradient.bottomColor);
+            gradient.addColorStop(0, timeLine.gradientFill.topColor);
+            gradient.addColorStop(0, timeLine.gradientFill.bottomColor);
             _this._ctx.fillStyle = gradient;
           } else {
             _this._ctx.fillStyle = timeLine.areaFillColor;
