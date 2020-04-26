@@ -60,7 +60,7 @@ export default class YAxis extends Axis {
         const y = this._innerConvertToPixel(+v)
         if (y > textHeight &&
           y < this._height - textHeight) {
-          optimalTicks.push({ v: isPercentageAxis ? `${(+v).toFixed(2)}%` : formatBigNumber(v), y })
+          optimalTicks.push({ v: isPercentageAxis ? `${(+v).toFixed(2)}%` : this._isCandleStickYAxis ? v : formatBigNumber(v), y })
         }
       }
     }
