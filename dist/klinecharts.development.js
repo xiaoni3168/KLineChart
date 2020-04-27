@@ -2676,11 +2676,11 @@ function formatPrecision(value) {
 
 function formatBigNumber(value) {
   if (isNumber(+value)) {
-    if (value > 50000) {
+    if (value >= 1000) {
       return "".concat(+(value / 1000).toFixed(1), "K");
     }
 
-    if (value > 5000000) {
+    if (value >= 1000000) {
       return "".concat(+(value / 1000000).toFixed(3), "M");
     }
 
@@ -5342,7 +5342,7 @@ var YAxis = /*#__PURE__*/function (_Axis) {
 
           if (_y > textHeight && _y < this._height - textHeight) {
             optimalTicks.push({
-              v: isPercentageAxis ? "".concat((+v).toFixed(2), "%") : formatBigNumber(v),
+              v: isPercentageAxis ? "".concat((+v).toFixed(2), "%") : this._isCandleStickYAxis ? v : formatBigNumber(v),
               y: _y
             });
           }
