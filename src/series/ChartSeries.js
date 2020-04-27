@@ -126,7 +126,7 @@ export default class ChartSeries {
         width += tickLine.length
       }
       if (yAxis.tickText.display) {
-        width += (tickText.margin + (tickText.size - 2) * (this._chartData._precisionOptions.price - 1))
+        width += (tickText.margin + (tickText.size - 3) * this._chartData._precisionOptions.price)
       }
     }
     if (width > 0) {

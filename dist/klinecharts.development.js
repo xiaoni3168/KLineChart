@@ -2679,7 +2679,7 @@ function formatPrecision(value) {
 
 function formatBigNumber(value) {
   if (isNumber(+value)) {
-    if (value >= 1000) {
+    if (value >= 1000 && value < 1000000) {
       return "".concat(+(value / 1000).toFixed(1), "K");
     }
 
@@ -9965,7 +9965,7 @@ var ChartSeries = /*#__PURE__*/function () {
         }
 
         if (yAxis.tickText.display) {
-          width += tickText.margin + (tickText.size - 2) * (this._chartData._precisionOptions.price - 1);
+          width += tickText.margin + (tickText.size - 3) * this._chartData._precisionOptions.price;
         }
       }
 
