@@ -6363,7 +6363,7 @@ var CandleStickFloatLayerView = /*#__PURE__*/function (_TechnicalIndicatorFl) {
 
             default:
               {
-                var _value = formatPrecision(_value, precisionOptions.price);
+                var _value = formatPrecision(value, precisionOptions.price);
 
                 var color = floatLayerPromptCandleStick.text.color;
 

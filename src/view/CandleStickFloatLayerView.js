@@ -235,7 +235,7 @@ export default class CandleStickFloatLayerView extends TechnicalIndicatorFloatLa
             break
           }
           default: {
-            let value = formatPrecision(value, precisionOptions.price)
+            let _value = formatPrecision(value, precisionOptions.price)
             let color = floatLayerPromptCandleStick.text.color
             if (open > close) {
               color = floatLayerPromptCandleStick.text.downColor
@@ -244,7 +244,7 @@ export default class CandleStickFloatLayerView extends TechnicalIndicatorFloatLa
             } else {
               color = floatLayerPromptCandleStick.text.noChangeColor
             }
-            values[index] = { value, color }
+            values[index] = { value: _value, color }
             break
           }
         }
