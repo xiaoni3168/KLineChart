@@ -223,6 +223,7 @@ export default class CandleStickFloatLayerView extends TechnicalIndicatorFloatLa
         formatValue(kLineData, 'low'),
         formatValue(kLineData, 'volume')
       ]
+      let open = values[1], close = values[2]
       values.forEach((value, index) => {
         switch (index) {
           case 0: {
@@ -234,7 +235,16 @@ export default class CandleStickFloatLayerView extends TechnicalIndicatorFloatLa
             break
           }
           default: {
-            values[index] = formatPrecision(value, precisionOptions.price)
+            let value = formatPrecision(value, precisionOptions.price)
+            let color = floatLayerPromptCandleStick.text.color
+            if (open > close) {
+              color = floatLayerPromptCandleStick.text.downColor
+            } else if (open < close) {
+              color = floatLayerPromptCandleStick.text.upColor
+            } else {
+              color = floatLayerPromptCandleStick.text.noChangeColor
+            }
+            values[index] = { value, color }
             break
           }
         }

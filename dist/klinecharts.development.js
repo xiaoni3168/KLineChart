@@ -744,6 +744,9 @@ var defaultFloatLayer = {
         size: 12,
         family: 'Arial',
         color: '#D9D9D9',
+        upColor: '#D9D9D9',
+        downColor: '#D9D9D9',
+        noChangeColor: '#D9D9D9',
         marginLeft: 8,
         marginTop: 6,
         marginRight: 8,
@@ -6342,6 +6345,8 @@ var CandleStickFloatLayerView = /*#__PURE__*/function (_TechnicalIndicatorFl) {
         var precisionOptions = this._chartData.precisionOptions();
 
         values = [formatValue(kLineData, 'timestamp'), formatValue(kLineData, 'open'), formatValue(kLineData, 'close'), formatValue(kLineData, 'high'), formatValue(kLineData, 'low'), formatValue(kLineData, 'volume')];
+        var open = values[1],
+            close = values[2];
         values.forEach(function (value, index) {
           switch (index) {
             case 0:
@@ -6358,7 +6363,22 @@ var CandleStickFloatLayerView = /*#__PURE__*/function (_TechnicalIndicatorFl) {
 
             default:
               {
-                values[index] = formatPrecision(value, precisionOptions.price);
+                var _value = formatPrecision(_value, precisionOptions.price);
+
+                var color = floatLayerPromptCandleStick.text.color;
+
+                if (open > close) {
+                  color = floatLayerPromptCandleStick.text.downColor;
+                } else if (open < close) {
+                  color = floatLayerPromptCandleStick.text.upColor;
+                } else {
+                  color = floatLayerPromptCandleStick.text.noChangeColor;
+                }
+
+                values[index] = {
+                  value: _value,
+                  color: color
+                };
                 break;
               }
           }
