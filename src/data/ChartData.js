@@ -1,3 +1,17 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { isArray, isObject, merge, clone, isFunction, isBoolean, isNumber } from '../utils/typeChecks'
 import { defaultStyleOptions } from './options/styleOptions'
 import { defaultTechnicalIndicatorParamOptions, TechnicalIndicatorType } from './options/technicalIndicatorParamOptions'
@@ -230,19 +244,32 @@ export default class ChartData {
 
   /**
    * 计算指标
+   * @param series
    * @param technicalIndicatorType
-   * @returns {boolean}
    */
-  calcTechnicalIndicator (technicalIndicatorType) {
-    if (technicalIndicatorType === TechnicalIndicatorType.NO) {
-      return true
-    }
-    const calcFun = calcIndicator[technicalIndicatorType]
-    if (calcFun) {
-      this._dataList = calcFun(this._dataList, this._technicalIndicatorParamOptions[technicalIndicatorType])
-      return true
-    }
-    return false
+  calcTechnicalIndicator (series, technicalIndicatorType) {
+    new Promise((resolve, reject) => {
+      if (technicalIndicatorType === TechnicalIndicatorType.NO) {
+        resolve(true)
+      }
+      const calcFun = calcIndicator[technicalIndicatorType]
+      if (calcFun) {
+        this._dataList = calcFun(this._dataList, this._technicalIndicatorParamOptions[technicalIndicatorType])
+        resolve(true)
+      }
+      reject(new Error('Technical indicator type is error!'))
+    }).then(
+      _ => {
+        const level = this._to - this._from < this._totalDataSpace / this._dataSpace ? InvalidateLevel.FULL : InvalidateLevel.MAIN
+        if (isArray(series)) {
+          for (const s of series) {
+            s.invalidate(level)
+          }
+        } else {
+          series.invalidate(level)
+        }
+      }
+    ).catch(_ => {})
   }
 
   /**
@@ -277,24 +304,19 @@ export default class ChartData {
         this._more = isBoolean(more) ? more : true
         this._dataList = data.concat(this._dataList)
         this.adjustOffsetBarCount()
-        return InvalidateLevel.FULL
       } else {
         const dataSize = this._dataList.length
         if (pos >= dataSize) {
-          const level = this._to - this._from < this._totalDataSpace / this._dataSpace ? InvalidateLevel.FULL : InvalidateLevel.MAIN
           this._dataList.push(data)
           if (this._offsetRightBarCount < 0) {
             this._offsetRightBarCount -= 1
           }
           this.adjustOffsetBarCount()
-          return level
         } else {
           this._dataList[pos] = data
-          return InvalidateLevel.MAIN
         }
       }
     }
-    return InvalidateLevel.NONE
   }
 
   /**

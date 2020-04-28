@@ -1,15 +1,28 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import Series from './Series'
 import TechnicalIndicatorWidget from '../widget/TechnicalIndicatorWidget'
 import YAxisWidget from '../widget/YAxisWidget'
 import { TechnicalIndicatorType } from '../data/options/technicalIndicatorParamOptions'
 import YAxis from '../component/YAxis'
-import { InvalidateLevel } from '../data/ChartData'
 
 export default class TechnicalIndicatorSeries extends Series {
   constructor (props) {
     super(props)
     this._technicalIndicatorType = props.technicalIndicatorType || TechnicalIndicatorType.MACD
-    this._calcTechnicalIndicator()
+    this._chartData.calcTechnicalIndicator(this, this._technicalIndicatorType)
   }
 
   _initBefore (props) {
@@ -56,16 +69,6 @@ export default class TechnicalIndicatorSeries extends Series {
   }
 
   /**
-   * 计算指标
-   * @private
-   */
-  _calcTechnicalIndicator () {
-    if (this._chartData.calcTechnicalIndicator(this._technicalIndicatorType)) {
-      this.invalidate(InvalidateLevel.FULL)
-    }
-  }
-
-  /**
    * 获取标识
    * @returns {string}
    */
@@ -99,7 +102,7 @@ export default class TechnicalIndicatorSeries extends Series {
   setTechnicalIndicatorType (technicalIndicatorType) {
     if (this._technicalIndicatorType !== technicalIndicatorType) {
       this._technicalIndicatorType = technicalIndicatorType
-      this._calcTechnicalIndicator()
+      this._chartData.calcTechnicalIndicator(this, this._technicalIndicatorType)
     }
   }
 }

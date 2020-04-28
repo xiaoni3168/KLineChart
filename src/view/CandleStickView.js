@@ -1,6 +1,20 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import TechnicalIndicatorView from './TechnicalIndicatorView'
 import { LineStyle, CandleStickStyle, ChartType } from '../data/options/styleOptions'
-import { drawHorizontalLine, drawVerticalLine, getFont, strokeInPixel } from '../utils/canvas'
+import { drawHorizontalLine, drawVerticalLine, getFont, drawLine } from '../utils/canvas'
 import { formatPrecision } from '../utils/format'
 
 export default class CandleStickView extends TechnicalIndicatorView {
@@ -59,7 +73,7 @@ export default class CandleStickView extends TechnicalIndicatorView {
         // 绘制分时线
         this._ctx.lineWidth = timeLine.size
         this._ctx.strokeStyle = timeLine.color
-        strokeInPixel(this._ctx, () => {
+        drawLine(this._ctx, () => {
           this._ctx.beginPath()
           this._ctx.moveTo(timeLinePoints[0].x, timeLinePoints[0].y)
           for (let i = 1; i < timeLinePoints.length; i++) {
@@ -93,7 +107,7 @@ export default class CandleStickView extends TechnicalIndicatorView {
         // 绘制均线
         this._ctx.lineWidth = averageLine.size
         this._ctx.strokeStyle = averageLine.color
-        strokeInPixel(this._ctx, () => {
+        drawLine(this._ctx, () => {
           this._ctx.beginPath()
           this._ctx.moveTo(averageLinePoints[0].x, averageLinePoints[0].y)
           for (let i = 1; i < averageLinePoints.length; i++) {
@@ -165,8 +179,8 @@ export default class CandleStickView extends TechnicalIndicatorView {
           lowLine[0] = closeY
           rect = [x - halfBarSpace, openY, barSpace, 1]
         }
-        this._ctx.fillRect(x - 0.5, highLine[0], 1, highLine[1] - highLine[0] + 1)
-        this._ctx.fillRect(x - 0.5, lowLine[0], 1, lowLine[1] - lowLine[0] + 1)
+        this._ctx.fillRect(x - 0.5, highLine[0], 1, highLine[1] - highLine[0])
+        this._ctx.fillRect(x - 0.5, lowLine[0], 1, lowLine[1] - lowLine[0])
 
         if (rect[3] < 1) {
           rect[3] = 1
@@ -265,7 +279,7 @@ export default class CandleStickView extends TechnicalIndicatorView {
     this._ctx.strokeStyle = priceMark.color
     this._ctx.fillStyle = priceMark.color
 
-    strokeInPixel(this._ctx, () => {
+    drawLine(this._ctx, () => {
       this._ctx.beginPath()
       this._ctx.moveTo(startX, startY)
       this._ctx.lineTo(startX - 2, startY + (isHigh ? -2 : 2))

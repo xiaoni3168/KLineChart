@@ -1,7 +1,21 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import View from './View'
 import { TechnicalIndicatorType, getTechnicalIndicatorDataKeysAndValues } from '../data/options/technicalIndicatorParamOptions'
 import { LineStyle } from '../data/options/styleOptions'
-import { drawHorizontalLine, drawVerticalLine, strokeInPixel } from '../utils/canvas'
+import { drawHorizontalLine, drawVerticalLine, drawLine } from '../utils/canvas'
 import { formatValue } from '../utils/format'
 
 export default class TechnicalIndicatorView extends View {
@@ -191,7 +205,7 @@ export default class TechnicalIndicatorView extends View {
     const pointCount = linePoints.length
     const colorSize = (colors || []).length
     this._ctx.lineWidth = technicalIndicatorOptions.line.size
-    strokeInPixel(this._ctx, () => {
+    drawLine(this._ctx, () => {
       for (let i = 0; i < pointCount; i++) {
         const points = linePoints[i]
         if (points.length > 0) {

@@ -1,3 +1,17 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import ChartData, { InvalidateLevel } from '../data/ChartData'
 import CandleStickSeries from './CandleStickSeries'
 import XAxisSeries from './XAxisSeries'
@@ -75,7 +89,11 @@ export default class ChartSeries {
    * @private
    */
   _separatorDrag (dragDistance, seriesIndex) {
-    this._technicalIndicatorSeries[seriesIndex].setTempHeight(this._separatorDragStartTechnicalIndicatorHeight - dragDistance)
+    let height = this._separatorDragStartTechnicalIndicatorHeight - dragDistance
+    if (height < 0) {
+      height = 0
+    }
+    this._technicalIndicatorSeries[seriesIndex].setHeight(height)
     this.measureSeriesSize()
   }
 
@@ -165,21 +183,23 @@ export default class ChartSeries {
    */
   _calcAllSeriesTechnicalIndicator () {
     const technicalIndicatorTypeArray = []
+    let candleStickTechnicalIndicatorType
     if (this._candleStickSeries.chartType() === ChartType.CANDLE_STICK) {
-      technicalIndicatorTypeArray.push(this._candleStickSeries.technicalIndicatorType())
+      candleStickTechnicalIndicatorType = this._candleStickSeries.technicalIndicatorType()
+      technicalIndicatorTypeArray.push(candleStickTechnicalIndicatorType)
     } else {
-      this._chartData.calcTechnicalIndicator(TechnicalIndicatorType.AVERAGE)
+      candleStickTechnicalIndicatorType = TechnicalIndicatorType.AVERAGE
     }
+    this._chartData.calcTechnicalIndicator(this._candleStickSeries, candleStickTechnicalIndicatorType)
     for (const series of this._technicalIndicatorSeries) {
       const technicalIndicatorSeriesTechnicalIndicatorType = series.technicalIndicatorType()
       if (technicalIndicatorTypeArray.indexOf(technicalIndicatorSeriesTechnicalIndicatorType) < 0) {
         technicalIndicatorTypeArray.push(technicalIndicatorSeriesTechnicalIndicatorType)
+        this._chartData.calcTechnicalIndicator(series, technicalIndicatorSeriesTechnicalIndicatorType)
+      } else {
+        series.invalidate(InvalidateLevel.FULL)
       }
     }
-    for (const technicalIndicatorType of technicalIndicatorTypeArray) {
-      this._chartData.calcTechnicalIndicator(technicalIndicatorType)
-    }
-    this._updateSeries()
   }
 
   /**
@@ -215,7 +235,14 @@ export default class ChartSeries {
     }
     let technicalIndicatorSeriesTotalHeight = 0
     for (const series of this._technicalIndicatorSeries) {
-      technicalIndicatorSeriesTotalHeight += series.height()
+      const seriesHeight = series.height()
+      technicalIndicatorSeriesTotalHeight += seriesHeight
+      // 修复拖拽会超出容器高度问题
+      if (technicalIndicatorSeriesTotalHeight > seriesExcludeXAxisSeparatorHeight) {
+        const difHeight = technicalIndicatorSeriesTotalHeight - seriesExcludeXAxisSeparatorHeight
+        technicalIndicatorSeriesTotalHeight = seriesExcludeXAxisSeparatorHeight
+        series.setHeight(seriesHeight - difHeight)
+      }
     }
 
     const candleStickSeriesHeight = seriesExcludeXAxisSeparatorHeight - technicalIndicatorSeriesTotalHeight
@@ -255,33 +282,24 @@ export default class ChartSeries {
   }
 
   /**
-   * 加载样式配置
-   * @param styleOptions
-   */
-  applyStyleOptions (styleOptions) {
-    this._chartData.applyStyleOptions(styleOptions)
-    this.measureSeriesSize()
-  }
-
-  /**
    * 加载技术指标参数
    * @param technicalIndicatorType
    * @param params
    */
   applyTechnicalIndicatorParams (technicalIndicatorType, params) {
     this._chartData.applyTechnicalIndicatorParams(technicalIndicatorType, params)
-    if (this._chartData.calcTechnicalIndicator(technicalIndicatorType)) {
-      const candleStickSeriesTechnicalIndicatorType = this._candleStickSeries.technicalIndicatorType()
-      if (candleStickSeriesTechnicalIndicatorType === technicalIndicatorType) {
-        this._candleStickSeries.invalidate(InvalidateLevel.FULL)
-      }
-      for (const series of this._technicalIndicatorSeries) {
-        const seriesTechnicalIndicatorType = series.technicalIndicatorType()
-        if (seriesTechnicalIndicatorType === technicalIndicatorType) {
-          series.invalidate(InvalidateLevel.FULL)
-        }
+    const seriesCollection = []
+    const candleStickSeriesTechnicalIndicatorType = this._candleStickSeries.technicalIndicatorType()
+    if (candleStickSeriesTechnicalIndicatorType === technicalIndicatorType) {
+      seriesCollection.push(this._candleStickSeries)
+    }
+    for (const series of this._technicalIndicatorSeries) {
+      const seriesTechnicalIndicatorType = series.technicalIndicatorType()
+      if (seriesTechnicalIndicatorType === technicalIndicatorType) {
+        seriesCollection.push(series)
       }
     }
+    this._chartData.calcTechnicalIndicator(seriesCollection, technicalIndicatorType)
   }
 
   /**
@@ -296,10 +314,9 @@ export default class ChartSeries {
       if (isFunction(extendFun)) {
         extendFun()
       }
-      const level = this._chartData.addData(dataList, 0, more)
-      if (level !== InvalidateLevel.NONE) {
-        this._calcAllSeriesTechnicalIndicator(level)
-      }
+      this._chartData.addData(dataList, 0, more)
+      this._xAxisSeries.invalidate(InvalidateLevel.FULL)
+      this._calcAllSeriesTechnicalIndicator()
     }
   }
 
@@ -339,6 +356,7 @@ export default class ChartSeries {
         pos = dataSize - 1
       }
       this._chartData.addData(data, pos)
+      this._xAxisSeries.invalidate(pos === dataSize - 1 ? InvalidateLevel.NONE : InvalidateLevel.FULL)
       this._calcAllSeriesTechnicalIndicator()
     }
   }
@@ -385,7 +403,7 @@ export default class ChartSeries {
       technicalIndicatorType,
       tag
     })
-    technicalIndicatorSeries.setTempHeight(height)
+    technicalIndicatorSeries.setHeight(height)
     this._technicalIndicatorSeries.push(technicalIndicatorSeries)
     this.measureSeriesSize()
     return tag
@@ -443,12 +461,22 @@ export default class ChartSeries {
   }
 
   /**
+   * 设置时区
+   * @param timezone
+   */
+  setTimezone (timezone) {
+    this._chartData.setTimezone(timezone)
+    this._xAxisSeries.invalidate(InvalidateLevel.FULL)
+  }
+
+  /**
    * 获取图表转换为图片后url
    * @param includeFloatLayer,
    * @param includeGraphicMark
    * @param type
+   * @param backgroundColor
    */
-  getConvertPictureUrl (includeFloatLayer, includeGraphicMark, type = 'jpeg') {
+  getConvertPictureUrl (includeFloatLayer, includeGraphicMark, type = 'jpeg', backgroundColor = '#333333') {
     if (type !== 'png' && type !== 'jpeg' && type !== 'bmp') {
       throw new Error('Picture format only supports jpeg, png and bmp!!!')
     }
@@ -462,6 +490,9 @@ export default class ChartSeries {
     canvas.width = width * pixelRatio
     canvas.height = height * pixelRatio
     ctx.scale(pixelRatio, pixelRatio)
+
+    ctx.fillStyle = backgroundColor
+    ctx.fillRect(0, 0, width, height)
     let offsetTop = 0
     const candleStickSeriesHeight = this._candleStickSeries.height()
     ctx.drawImage(

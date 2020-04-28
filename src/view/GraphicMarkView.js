@@ -1,3 +1,17 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import View from './View'
 import {
   checkPointOnCircle,
@@ -11,7 +25,7 @@ import {
 import { GraphicMarkType } from '../data/ChartData'
 import { GraphicMarkDrawStep } from '../event/GraphicMarkEventHandler'
 import { formatPrecision } from '../utils/format'
-import { drawHorizontalLine, drawVerticalLine, getFont, strokeInPixel } from '../utils/canvas'
+import { drawHorizontalLine, drawVerticalLine, getFont, drawLine } from '../utils/canvas'
 
 const LineType = {
   COMMON: 0,
@@ -329,7 +343,7 @@ export default class GraphicMarkView extends View {
           const lineType = this._getLineType(points[0], points[1])
           switch (lineType) {
             case LineType.COMMON: {
-              strokeInPixel(this._ctx, () => {
+              drawLine(this._ctx, () => {
                 this._ctx.beginPath()
                 this._ctx.moveTo(points[0].x, points[0].y)
                 this._ctx.lineTo(points[1].x, points[1].y)

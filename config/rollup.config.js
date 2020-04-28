@@ -1,7 +1,7 @@
 const babel = require('rollup-plugin-babel')
 const fileSize = require('rollup-plugin-filesize')
 const { terser } = require('rollup-plugin-terser')
-const replace = require('rollup-plugin-replace')
+const replace = require('@rollup/plugin-replace')
 const packageJson = require('../package.json')
 
 const inputPath = 'src/index.js'
@@ -13,8 +13,8 @@ const getPlugins = (env) => {
     }),
     fileSize(),
     replace({
-      'process.env.NODE_ENV': JSON.stringify(env),
-      'K_LINE_VERSION': packageJson.version,
+      '__BUILD_ENV__': env,
+      '__BUILD_VERSION__': packageJson.version,
     }),
     env === 'production' && terser({
       compress: {

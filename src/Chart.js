@@ -1,5 +1,19 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import ChartSeries, { CANDLE_STICK_SERIES_TAG } from './series/ChartSeries'
-import { isArray } from './utils/typeChecks'
+import { isArray, clone } from './utils/typeChecks'
 import { GraphicMarkType } from './data/ChartData'
 
 export default class Chart {
@@ -12,7 +26,8 @@ export default class Chart {
    * @param options
    */
   setStyleOptions (options) {
-    this._chartSeries.applyStyleOptions(options)
+    this._chartSeries.chartData().applyStyleOptions(options)
+    this._chartSeries.measureSeriesSize()
   }
 
   /**
@@ -20,7 +35,7 @@ export default class Chart {
    * @returns {[]|*[]}
    */
   getStyleOptions () {
-    return this._chartSeries.chartData().styleOptions()
+    return clone(this._chartSeries.chartData().styleOptions())
   }
 
   /**
@@ -36,7 +51,7 @@ export default class Chart {
    * 获取技术指标参数配置
    */
   getTechnicalIndicatorParamOptions () {
-    this._chartSeries.chartData().technicalIndicatorParamOptions()
+    return clone(this._chartSeries.chartData().technicalIndicatorParamOptions())
   }
 
   /**
@@ -53,7 +68,7 @@ export default class Chart {
    * @param timezone
    */
   setTimezone (timezone) {
-    this._chartSeries.chartData().setTimezone(timezone)
+    this._chartSeries.setTimezone(timezone)
   }
 
   /**
@@ -225,9 +240,10 @@ export default class Chart {
    * @param includeFloatLayer
    * @param includeGraphicMark
    * @param type
+   * @param backgroundColor
    */
-  getConvertPictureUrl (includeFloatLayer, includeGraphicMark, type) {
-    return this._chartSeries.getConvertPictureUrl(includeFloatLayer, includeGraphicMark, type)
+  getConvertPictureUrl (includeFloatLayer, includeGraphicMark, type, backgroundColor) {
+    return this._chartSeries.getConvertPictureUrl(includeFloatLayer, includeGraphicMark, type, backgroundColor)
   }
 
   /**

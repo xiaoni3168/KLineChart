@@ -252,6 +252,19 @@ function _createForOfIteratorHelper(o) {
   };
 }
 
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 function merge(target, source) {
   if (!isObject(target) || !isObject(source)) {
     return;
@@ -341,6 +354,20 @@ function isNumber(value) {
 function isBoolean(value) {
   return typeof value === 'boolean';
 }
+
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /**
  * 线的样式
@@ -542,7 +569,7 @@ var defaultTechnicalIndicator = {
   bar: {
     upColor: '#26A69A',
     downColor: '#EF5350',
-    noChangeColor: '#999999'
+    noChangeColor: '#666666'
   },
   line: {
     size: 1,
@@ -824,6 +851,19 @@ var defaultStyleOptions = {
 
 var _defaultTechnicalIndi;
 
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 var TechnicalIndicatorType = {
   NO: 'NO',
   AVERAGE: 'AVERAGE',
@@ -2553,6 +2593,19 @@ function checkParamsWithSize(params, paramsSize) {
 }
 
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * 格式化值
  * @param data
  * @param key
@@ -2938,25 +2991,49 @@ var ChartData = /*#__PURE__*/function () {
     }
     /**
      * 计算指标
+     * @param series
      * @param technicalIndicatorType
-     * @returns {boolean}
      */
 
   }, {
     key: "calcTechnicalIndicator",
-    value: function calcTechnicalIndicator(technicalIndicatorType) {
-      if (technicalIndicatorType === TechnicalIndicatorType.NO) {
-        return true;
-      }
+    value: function calcTechnicalIndicator(series, technicalIndicatorType) {
+      var _this = this;
 
-      var calcFun = calcIndicator[technicalIndicatorType];
+      new Promise(function (resolve, reject) {
+        if (technicalIndicatorType === TechnicalIndicatorType.NO) {
+          resolve(true);
+        }
 
-      if (calcFun) {
-        this._dataList = calcFun(this._dataList, this._technicalIndicatorParamOptions[technicalIndicatorType]);
-        return true;
-      }
+        var calcFun = calcIndicator[technicalIndicatorType];
 
-      return false;
+        if (calcFun) {
+          _this._dataList = calcFun(_this._dataList, _this._technicalIndicatorParamOptions[technicalIndicatorType]);
+          resolve(true);
+        }
+
+        reject(new Error('Technical indicator type is error!'));
+      }).then(function (_) {
+        var level = _this._to - _this._from < _this._totalDataSpace / _this._dataSpace ? InvalidateLevel.FULL : InvalidateLevel.MAIN;
+
+        if (isArray(series)) {
+          var _iterator = _createForOfIteratorHelper(series),
+              _step;
+
+          try {
+            for (_iterator.s(); !(_step = _iterator.n()).done;) {
+              var s = _step.value;
+              s.invalidate(level);
+            }
+          } catch (err) {
+            _iterator.e(err);
+          } finally {
+            _iterator.f();
+          }
+        } else {
+          series.invalidate(level);
+        }
+      }).catch(function (_) {});
     }
     /**
      * 获取数据源
@@ -2997,13 +3074,10 @@ var ChartData = /*#__PURE__*/function () {
           this._more = isBoolean(more) ? more : true;
           this._dataList = data.concat(this._dataList);
           this.adjustOffsetBarCount();
-          return InvalidateLevel.FULL;
         } else {
           var dataSize = this._dataList.length;
 
           if (pos >= dataSize) {
-            var level = this._to - this._from < this._totalDataSpace / this._dataSpace ? InvalidateLevel.FULL : InvalidateLevel.MAIN;
-
             this._dataList.push(data);
 
             if (this._offsetRightBarCount < 0) {
@@ -3011,15 +3085,11 @@ var ChartData = /*#__PURE__*/function () {
             }
 
             this.adjustOffsetBarCount();
-            return level;
           } else {
             this._dataList[pos] = data;
-            return InvalidateLevel.MAIN;
           }
         }
       }
-
-      return InvalidateLevel.NONE;
     }
     /**
      * 获取一条数据的空间
@@ -3396,6 +3466,20 @@ var ChartData = /*#__PURE__*/function () {
 }();
 
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * 获取屏幕比
  * @param ctx
  * @returns {number}
@@ -3463,7 +3547,7 @@ function drawVerticalLine(ctx, x, top, bottom) {
  * @param drawFuc
  */
 
-function strokeInPixel(ctx, drawFuc) {
+function drawLine(ctx, drawFuc) {
   ctx.save();
 
   if (ctx.lineWidth % 2) {
@@ -3597,8 +3681,8 @@ var Series = /*#__PURE__*/function () {
      */
 
   }, {
-    key: "setTempHeight",
-    value: function setTempHeight(height) {
+    key: "setHeight",
+    value: function setHeight(height) {
       this._height = height;
     }
     /**
@@ -3823,6 +3907,20 @@ var Widget = /*#__PURE__*/function () {
 }();
 
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * requestAnimationFrame兼容
  * @param fn
  */
@@ -3919,8 +4017,7 @@ var View = /*#__PURE__*/function () {
         _this._canvas.width = width * pixelRatio;
         _this._canvas.height = height * pixelRatio;
 
-        _this._ctx.scale(pixelRatio, pixelRatio); // this._ctx.translate(0.5, 0.5)
-
+        _this._ctx.scale(pixelRatio, pixelRatio);
       });
     }
     /**
@@ -4205,7 +4302,7 @@ var TechnicalIndicatorView = /*#__PURE__*/function (_View) {
       var pointCount = linePoints.length;
       var colorSize = (colors || []).length;
       this._ctx.lineWidth = technicalIndicatorOptions.line.size;
-      strokeInPixel(this._ctx, function () {
+      drawLine(this._ctx, function () {
         for (var i = 0; i < pointCount; i++) {
           var points = linePoints[i];
 
@@ -5092,6 +5189,19 @@ var YAxisWidget = /*#__PURE__*/function (_Widget) {
   return YAxisWidget;
 }(Widget);
 
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 var Axis = /*#__PURE__*/function () {
   function Axis(chartData) {
     _classCallCheck(this, Axis);
@@ -5498,7 +5608,7 @@ var TechnicalIndicatorSeries = /*#__PURE__*/function (_Series) {
     _this = _super.call(this, props);
     _this._technicalIndicatorType = props.technicalIndicatorType || TechnicalIndicatorType.MACD;
 
-    _this._calcTechnicalIndicator();
+    _this._chartData.calcTechnicalIndicator(_assertThisInitialized(_this), _this._technicalIndicatorType);
 
     return _this;
   }
@@ -5554,18 +5664,6 @@ var TechnicalIndicatorSeries = /*#__PURE__*/function (_Series) {
       return false;
     }
     /**
-     * 计算指标
-     * @private
-     */
-
-  }, {
-    key: "_calcTechnicalIndicator",
-    value: function _calcTechnicalIndicator() {
-      if (this._chartData.calcTechnicalIndicator(this._technicalIndicatorType)) {
-        this.invalidate(InvalidateLevel.FULL);
-      }
-    }
-    /**
      * 获取标识
      * @returns {string}
      */
@@ -5611,7 +5709,7 @@ var TechnicalIndicatorSeries = /*#__PURE__*/function (_Series) {
       if (this._technicalIndicatorType !== technicalIndicatorType) {
         this._technicalIndicatorType = technicalIndicatorType;
 
-        this._calcTechnicalIndicator();
+        this._chartData.calcTechnicalIndicator(this, this._technicalIndicatorType);
       }
     }
   }]);
@@ -5734,7 +5832,7 @@ var CandleStickView = /*#__PURE__*/function (_TechnicalIndicatorVi) {
           // 绘制分时线
           _this._ctx.lineWidth = timeLine.size;
           _this._ctx.strokeStyle = timeLine.color;
-          strokeInPixel(_this._ctx, function () {
+          drawLine(_this._ctx, function () {
             _this._ctx.beginPath();
 
             _this._ctx.moveTo(timeLinePoints[0].x, timeLinePoints[0].y);
@@ -5780,7 +5878,7 @@ var CandleStickView = /*#__PURE__*/function (_TechnicalIndicatorVi) {
           // 绘制均线
           _this._ctx.lineWidth = averageLine.size;
           _this._ctx.strokeStyle = averageLine.color;
-          strokeInPixel(_this._ctx, function () {
+          drawLine(_this._ctx, function () {
             _this._ctx.beginPath();
 
             _this._ctx.moveTo(averageLinePoints[0].x, averageLinePoints[0].y);
@@ -5871,9 +5969,9 @@ var CandleStickView = /*#__PURE__*/function (_TechnicalIndicatorVi) {
             rect = [x - halfBarSpace, openY, barSpace, 1];
           }
 
-          _this2._ctx.fillRect(x - 0.5, highLine[0], 1, highLine[1] - highLine[0] + 1);
+          _this2._ctx.fillRect(x - 0.5, highLine[0], 1, highLine[1] - highLine[0]);
 
-          _this2._ctx.fillRect(x - 0.5, lowLine[0], 1, lowLine[1] - lowLine[0] + 1);
+          _this2._ctx.fillRect(x - 0.5, lowLine[0], 1, lowLine[1] - lowLine[0]);
 
           if (rect[3] < 1) {
             rect[3] = 1;
@@ -6001,7 +6099,7 @@ var CandleStickView = /*#__PURE__*/function (_TechnicalIndicatorVi) {
       this._ctx.lineWidth = 1;
       this._ctx.strokeStyle = priceMark.color;
       this._ctx.fillStyle = priceMark.color;
-      strokeInPixel(this._ctx, function () {
+      drawLine(this._ctx, function () {
         _this3._ctx.beginPath();
 
         _this3._ctx.moveTo(startX, startY);
@@ -6393,6 +6491,20 @@ var CandleStickFloatLayerView = /*#__PURE__*/function (_TechnicalIndicatorFl) {
 }(TechnicalIndicatorFloatLayerView);
 
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * 获取某点在两点决定的一次函数上的y值
  * @param point1
  * @param point2
@@ -6695,6 +6807,29 @@ function getFibonacciLines(points, size) {
   return lines;
 }
 
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * The file comes from tradingview/lightweight-charts
+ * https://www.tradingview.com/
+ * Convert files from typescript to javascript.
+ * Modified the class name.
+ * The use of the source code of this file is also subject to the terms
+ * and consitions of the license of "lightweight-charts" (Apache License V2, see
+ * </licenses/LICENSE-lightweight-charts>).
+ */
 var MouseEventButton = {
   LEFT: 0,
   RIGHT: 2
@@ -8522,7 +8657,7 @@ var GraphicMarkView = /*#__PURE__*/function (_View) {
             switch (lineType) {
               case LineType.COMMON:
                 {
-                  strokeInPixel(_this13._ctx, function () {
+                  drawLine(_this13._ctx, function () {
                     _this13._ctx.beginPath();
 
                     _this13._ctx.moveTo(points[0].x, points[0].y);
@@ -8735,11 +8870,7 @@ var CandleStickSeries = /*#__PURE__*/function (_TechnicalIndicatorSe) {
       if (this._chartType !== chartType) {
         this._chartType = chartType;
 
-        if (this._chartData.styleOptions().realTime.averageLine.display && this._isRealTime()) {
-          this._chartData.calcTechnicalIndicator(TechnicalIndicatorType.AVERAGE);
-        }
-
-        this.invalidate(InvalidateLevel.FULL);
+        this._chartData.calcTechnicalIndicator(this, TechnicalIndicatorType.AVERAGE);
       }
     }
   }]);
@@ -9619,14 +9750,14 @@ var KeyBoardEventHandler = /*#__PURE__*/function (_EventHandler) {
         switch (event.code) {
           case 'ArrowUp':
             {
-              this._chartData.zoom(-0.05, this._chartData.crossHairPoint());
+              this._chartData.zoom(-0.5, this._chartData.crossHairPoint());
 
               break;
             }
 
           case 'ArrowDown':
             {
-              this._chartData.zoom(0.05, this._chartData.crossHairPoint());
+              this._chartData.zoom(0.5, this._chartData.crossHairPoint());
 
               break;
             }
@@ -9899,7 +10030,13 @@ var ChartSeries = /*#__PURE__*/function () {
   }, {
     key: "_separatorDrag",
     value: function _separatorDrag(dragDistance, seriesIndex) {
-      this._technicalIndicatorSeries[seriesIndex].setTempHeight(this._separatorDragStartTechnicalIndicatorHeight - dragDistance);
+      var height = this._separatorDragStartTechnicalIndicatorHeight - dragDistance;
+
+      if (height < 0) {
+        height = 0;
+      }
+
+      this._technicalIndicatorSeries[seriesIndex].setHeight(height);
 
       this.measureSeriesSize();
     }
@@ -10027,12 +10164,16 @@ var ChartSeries = /*#__PURE__*/function () {
     key: "_calcAllSeriesTechnicalIndicator",
     value: function _calcAllSeriesTechnicalIndicator() {
       var technicalIndicatorTypeArray = [];
+      var candleStickTechnicalIndicatorType;
 
       if (this._candleStickSeries.chartType() === ChartType.CANDLE_STICK) {
-        technicalIndicatorTypeArray.push(this._candleStickSeries.technicalIndicatorType());
+        candleStickTechnicalIndicatorType = this._candleStickSeries.technicalIndicatorType();
+        technicalIndicatorTypeArray.push(candleStickTechnicalIndicatorType);
       } else {
-        this._chartData.calcTechnicalIndicator(TechnicalIndicatorType.AVERAGE);
+        candleStickTechnicalIndicatorType = TechnicalIndicatorType.AVERAGE;
       }
+
+      this._chartData.calcTechnicalIndicator(this._candleStickSeries, candleStickTechnicalIndicatorType);
 
       var _iterator2 = _createForOfIteratorHelper(this._technicalIndicatorSeries),
           _step2;
@@ -10044,6 +10185,10 @@ var ChartSeries = /*#__PURE__*/function () {
 
           if (technicalIndicatorTypeArray.indexOf(technicalIndicatorSeriesTechnicalIndicatorType) < 0) {
             technicalIndicatorTypeArray.push(technicalIndicatorSeriesTechnicalIndicatorType);
+
+            this._chartData.calcTechnicalIndicator(series, technicalIndicatorSeriesTechnicalIndicatorType);
+          } else {
+            series.invalidate(InvalidateLevel.FULL);
           }
         }
       } catch (err) {
@@ -10051,14 +10196,6 @@ var ChartSeries = /*#__PURE__*/function () {
       } finally {
         _iterator2.f();
       }
-
-      for (var _i = 0, _technicalIndicatorTy = technicalIndicatorTypeArray; _i < _technicalIndicatorTy.length; _i++) {
-        var technicalIndicatorType = _technicalIndicatorTy[_i];
-
-        this._chartData.calcTechnicalIndicator(technicalIndicatorType);
-      }
-
-      this._updateSeries();
     }
     /**
      * 获取图表上的数据
@@ -10112,7 +10249,16 @@ var ChartSeries = /*#__PURE__*/function () {
       try {
         for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
           var series = _step3.value;
-          technicalIndicatorSeriesTotalHeight += series.height();
+
+          var _seriesHeight = series.height();
+
+          technicalIndicatorSeriesTotalHeight += _seriesHeight; // 修复拖拽会超出容器高度问题
+
+          if (technicalIndicatorSeriesTotalHeight > seriesExcludeXAxisSeparatorHeight) {
+            var difHeight = technicalIndicatorSeriesTotalHeight - seriesExcludeXAxisSeparatorHeight;
+            technicalIndicatorSeriesTotalHeight = seriesExcludeXAxisSeparatorHeight;
+            series.setHeight(_seriesHeight - difHeight);
+          }
         }
       } catch (err) {
         _iterator3.e(err);
@@ -10182,18 +10328,6 @@ var ChartSeries = /*#__PURE__*/function () {
       this._chartEvent.setSeriesSize(seriesSize);
     }
     /**
-     * 加载样式配置
-     * @param styleOptions
-     */
-
-  }, {
-    key: "applyStyleOptions",
-    value: function applyStyleOptions(styleOptions) {
-      this._chartData.applyStyleOptions(styleOptions);
-
-      this.measureSeriesSize();
-    }
-    /**
      * 加载技术指标参数
      * @param technicalIndicatorType
      * @param params
@@ -10204,31 +10338,33 @@ var ChartSeries = /*#__PURE__*/function () {
     value: function applyTechnicalIndicatorParams(technicalIndicatorType, params) {
       this._chartData.applyTechnicalIndicatorParams(technicalIndicatorType, params);
 
-      if (this._chartData.calcTechnicalIndicator(technicalIndicatorType)) {
-        var candleStickSeriesTechnicalIndicatorType = this._candleStickSeries.technicalIndicatorType();
+      var seriesCollection = [];
 
-        if (candleStickSeriesTechnicalIndicatorType === technicalIndicatorType) {
-          this._candleStickSeries.invalidate(InvalidateLevel.FULL);
-        }
+      var candleStickSeriesTechnicalIndicatorType = this._candleStickSeries.technicalIndicatorType();
 
-        var _iterator4 = _createForOfIteratorHelper(this._technicalIndicatorSeries),
-            _step4;
-
-        try {
-          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-            var series = _step4.value;
-            var seriesTechnicalIndicatorType = series.technicalIndicatorType();
-
-            if (seriesTechnicalIndicatorType === technicalIndicatorType) {
-              series.invalidate(InvalidateLevel.FULL);
-            }
-          }
-        } catch (err) {
-          _iterator4.e(err);
-        } finally {
-          _iterator4.f();
-        }
+      if (candleStickSeriesTechnicalIndicatorType === technicalIndicatorType) {
+        seriesCollection.push(this._candleStickSeries);
       }
+
+      var _iterator4 = _createForOfIteratorHelper(this._technicalIndicatorSeries),
+          _step4;
+
+      try {
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+          var series = _step4.value;
+          var seriesTechnicalIndicatorType = series.technicalIndicatorType();
+
+          if (seriesTechnicalIndicatorType === technicalIndicatorType) {
+            seriesCollection.push(series);
+          }
+        }
+      } catch (err) {
+        _iterator4.e(err);
+      } finally {
+        _iterator4.f();
+      }
+
+      this._chartData.calcTechnicalIndicator(seriesCollection, technicalIndicatorType);
     }
     /**
      * 处理数组数据
@@ -10246,11 +10382,11 @@ var ChartSeries = /*#__PURE__*/function () {
           extendFun();
         }
 
-        var level = this._chartData.addData(dataList, 0, more);
+        this._chartData.addData(dataList, 0, more);
 
-        if (level !== InvalidateLevel.NONE) {
-          this._calcAllSeriesTechnicalIndicator(level);
-        }
+        this._xAxisSeries.invalidate(InvalidateLevel.FULL);
+
+        this._calcAllSeriesTechnicalIndicator();
       }
     }
     /**
@@ -10302,6 +10438,8 @@ var ChartSeries = /*#__PURE__*/function () {
 
         this._chartData.addData(data, pos);
 
+        this._xAxisSeries.invalidate(pos === dataSize - 1 ? InvalidateLevel.NONE : InvalidateLevel.FULL);
+
         this._calcAllSeriesTechnicalIndicator();
       }
     }
@@ -10347,7 +10485,7 @@ var ChartSeries = /*#__PURE__*/function () {
         technicalIndicatorType: technicalIndicatorType,
         tag: tag
       });
-      technicalIndicatorSeries.setTempHeight(height);
+      technicalIndicatorSeries.setHeight(height);
 
       this._technicalIndicatorSeries.push(technicalIndicatorSeries);
 
@@ -10382,8 +10520,8 @@ var ChartSeries = /*#__PURE__*/function () {
 
         this._separatorSeries.splice(seriesPos, 1);
 
-        for (var _i2 = 0; _i2 < this._separatorSeries.length; _i2++) {
-          this._separatorSeries[_i2].updateSeriesIndex(_i2);
+        for (var _i = 0; _i < this._separatorSeries.length; _i++) {
+          this._separatorSeries[_i].updateSeriesIndex(_i);
         }
 
         this.measureSeriesSize();
@@ -10431,16 +10569,30 @@ var ChartSeries = /*#__PURE__*/function () {
       }
     }
     /**
+     * 设置时区
+     * @param timezone
+     */
+
+  }, {
+    key: "setTimezone",
+    value: function setTimezone(timezone) {
+      this._chartData.setTimezone(timezone);
+
+      this._xAxisSeries.invalidate(InvalidateLevel.FULL);
+    }
+    /**
      * 获取图表转换为图片后url
      * @param includeFloatLayer,
      * @param includeGraphicMark
      * @param type
+     * @param backgroundColor
      */
 
   }, {
     key: "getConvertPictureUrl",
     value: function getConvertPictureUrl(includeFloatLayer, includeGraphicMark) {
       var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'jpeg';
+      var backgroundColor = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '#333333';
 
       if (type !== 'png' && type !== 'jpeg' && type !== 'bmp') {
         throw new Error('Picture format only supports jpeg, png and bmp!!!');
@@ -10456,6 +10608,8 @@ var ChartSeries = /*#__PURE__*/function () {
       canvas.width = width * pixelRatio;
       canvas.height = height * pixelRatio;
       ctx.scale(pixelRatio, pixelRatio);
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, width, height);
       var offsetTop = 0;
 
       var candleStickSeriesHeight = this._candleStickSeries.height();
@@ -10517,7 +10671,9 @@ var Chart = /*#__PURE__*/function () {
   _createClass(Chart, [{
     key: "setStyleOptions",
     value: function setStyleOptions(options) {
-      this._chartSeries.applyStyleOptions(options);
+      this._chartSeries.chartData().applyStyleOptions(options);
+
+      this._chartSeries.measureSeriesSize();
     }
     /**
      * 获取样式配置
@@ -10527,7 +10683,7 @@ var Chart = /*#__PURE__*/function () {
   }, {
     key: "getStyleOptions",
     value: function getStyleOptions() {
-      return this._chartSeries.chartData().styleOptions();
+      return clone(this._chartSeries.chartData().styleOptions());
     }
     /**
      * 加载技术指标参数
@@ -10547,7 +10703,7 @@ var Chart = /*#__PURE__*/function () {
   }, {
     key: "getTechnicalIndicatorParamOptions",
     value: function getTechnicalIndicatorParamOptions() {
-      this._chartSeries.chartData().technicalIndicatorParamOptions();
+      return clone(this._chartSeries.chartData().technicalIndicatorParamOptions());
     }
     /**
      * 加载精度
@@ -10568,7 +10724,7 @@ var Chart = /*#__PURE__*/function () {
   }, {
     key: "setTimezone",
     value: function setTimezone(timezone) {
-      this._chartSeries.chartData().setTimezone(timezone);
+      this._chartSeries.setTimezone(timezone);
     }
     /**
      * 重置尺寸，总是会填充父容器
@@ -10784,12 +10940,13 @@ var Chart = /*#__PURE__*/function () {
      * @param includeFloatLayer
      * @param includeGraphicMark
      * @param type
+     * @param backgroundColor
      */
 
   }, {
     key: "getConvertPictureUrl",
-    value: function getConvertPictureUrl(includeFloatLayer, includeGraphicMark, type) {
-      return this._chartSeries.getConvertPictureUrl(includeFloatLayer, includeGraphicMark, type);
+    value: function getConvertPictureUrl(includeFloatLayer, includeGraphicMark, type, backgroundColor) {
+      return this._chartSeries.getConvertPictureUrl(includeFloatLayer, includeGraphicMark, type, backgroundColor);
     }
     /**
      * 销毁
@@ -10805,6 +10962,19 @@ var Chart = /*#__PURE__*/function () {
   return Chart;
 }();
 
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+
+ * http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 var instances = {};
 var idBase = 1;
 var errorMessage = 'Chart version is 5.2.0. Root dom is null, can not initialize the chart!!!';
