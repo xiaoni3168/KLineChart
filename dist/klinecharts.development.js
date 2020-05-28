@@ -118,11 +118,13 @@ function _possibleConstructorReturn(self, call) {
 }
 
 function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
   return function () {
     var Super = _getPrototypeOf(Derived),
         result;
 
-    if (_isNativeReflectConstruct()) {
+    if (hasNativeReflectConstruct) {
       var NewTarget = _getPrototypeOf(this).constructor;
 
       result = Reflect.construct(Super, arguments, NewTarget);
@@ -181,7 +183,7 @@ function _unsupportedIterableToArray(o, minLen) {
   if (typeof o === "string") return _arrayLikeToArray(o, minLen);
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(n);
+  if (n === "Map" || n === "Set") return Array.from(o);
   if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 }
 
@@ -10005,7 +10007,9 @@ var ChartSeries = /*#__PURE__*/function () {
       this._chartContainer.style.outline = 'none';
       this._chartContainer.style.borderStyle = 'none';
       this._chartContainer.style.width = '100%';
-      this._chartContainer.style.cursor = 'crosshair';
+      this._chartContainer.style.cursor = 'crosshair'; // 解决FireFox上容器高度计算问题  
+
+      this._chartContainer.style.height = '0px';
       this._chartContainer.tabIndex = 1;
       container.appendChild(this._chartContainer);
     }
@@ -10977,14 +10981,14 @@ var Chart = /*#__PURE__*/function () {
  */
 var instances = {};
 var idBase = 1;
-var errorMessage = 'Chart version is 5.2.0. Root dom is null, can not initialize the chart!!!';
+var errorMessage = 'Chart version is 5.2.1. Root dom is null, can not initialize the chart!!!';
 /**
  * 获取版本号
  * @returns {string}
  */
 
 function version() {
-  return '5.2.0';
+  return '5.2.1';
 }
 /**
  * 初始化

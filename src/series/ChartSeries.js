@@ -69,6 +69,8 @@ export default class ChartSeries {
     this._chartContainer.style.borderStyle = 'none'
     this._chartContainer.style.width = '100%'
     this._chartContainer.style.cursor = 'crosshair'
+    // 解决FireFox上容器高度计算问题  
+    this._chartContainer.style.height = '0px'
     this._chartContainer.tabIndex = 1
     container.appendChild(this._chartContainer)
   }
